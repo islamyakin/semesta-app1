@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+
 	if r.URL.Path == "/" {
 		fmt.Fprint(w, `<body style="background-color:#000000">`)
 		fmt.Fprint(w, `<center><h1 style="color:#FFFFFF">Selamat datang di Semesta System Administrator</center></h1>`)
@@ -19,25 +21,28 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	} else if r.URL.Path == "/aboutus" {
 		err := godotenv.Load(".env")
 		if err != nil {
-			http.Error(w, "Gagal memuat file .env", http.StatusInternalServerError)
+			fmt.Fprintf(w, "<center><h1>Gagal memuat file .env, silahkan cek kembali</h1></center>")
 			fmt.Println("Gagal memuat file .env:", err)
 			return
 		}
 		targetURL := os.Getenv("APP2_URL")
 		if targetURL == "" {
-			http.Error(w, "URL tujuan tidak ditentukan", http.StatusInternalServerError)
+			fmt.Fprintf(w, "<center><h1>URL Web App ke 2 tidak ditemukan, silahkan cek file .env</h1></center>")
+			fmt.Fprint(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
 			fmt.Println("URL tujuan tidak ditentukan")
 			return
 		}
 		resp, err := http.Get(targetURL)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Gagal memuat konten dari %s: %s", targetURL, err.Error()), http.StatusInternalServerError)
+			fmt.Fprintf(w, "<center><h1>Halaman yang dicari tidak ditemukan, Silahkan cek kembali url Web App ke 2</h1></center>")
+			fmt.Fprint(w, fmt.Sprintf("<center>Gagal memuat konten dari %s: %s</center>", targetURL, err.Error()))
+			fmt.Fprint(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
 			fmt.Println("Gagal memuat konten:", err)
 			return
 		}
-		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
 
 		if err != nil {
 			http.Error(w, "Gagal membaca respons", http.StatusInternalServerError)
@@ -47,11 +52,18 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s", body)
 	} else {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "<h1>Halaman yang dicari tidak ditemukan</h1>")
+		fmt.Fprint(w, "<h1><center>Halaman yang dicari tidak ditemukan</center></h1>")
 	}
 }
 
 func main() {
-	http.HandleFunc("/", handlerFunc)
-	http.ListenAndServe(":3000", nil)
+	server := &http.Server{
+		Addr:              ":3000",
+		Handler:           http.HandlerFunc(handlerFunc),
+		ReadHeaderTimeout: 3 * time.Second,
+	}
+	err := server.ListenAndServe()
+	if err != nil {
+		panic(err)
+	}
 }
