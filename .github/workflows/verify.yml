@@ -23,7 +23,7 @@ jobs:
     - name: install dependencies
       run: |
         go version
-        go get github.com/joho/godotenv
+        
     - name: Build
       run: go build -v ./...
 
