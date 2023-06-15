@@ -28,7 +28,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		targetURL := os.Getenv("APP2_URL")
 		if targetURL == "" {
 			fmt.Fprintf(w, "<center><h1>URL Web App ke 2 tidak ditemukan, silahkan cek file .env</h1></center>")
-			fmt.Fprint(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
+			fmt.Fprintf(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
 			fmt.Println("URL tujuan tidak ditentukan")
 			return
 		}
@@ -36,7 +36,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Fprintf(w, "<center><h1>Halaman yang dicari tidak ditemukan, Silahkan cek kembali url Web App ke 2</h1></center>")
 			fmt.Fprintf(w, fmt.Sprintf("<center>Gagal memuat konten dari %s: %s</center>", targetURL, err.Error()))
-			fmt.Fprint(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
+			fmt.Fprintf(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
 			fmt.Println("Gagal memuat konten:", err)
 			return
 		}
