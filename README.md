@@ -1,5 +1,12 @@
-# SEMESTA
+# SEMESTA - System Adminstrator
 ## Details
-App ini berjalan pada port default 3000
+Repository ini berisi Web App bagian pertama, yang menampilkan Semesta dengan path ```/```, app ini berjalan pada port default 3000
 ## Config
-silahkan mengubah file ```.env``` ```APP2_URL=``` dengan alamat ip App ke 2
+- Silahkan copy file ```.env.example``` menjadi ```.env``` 
+- Kemudian edit ```APP2_URL=``` dengan alamat App ke 2
+
+### Example
+```APP2_URL=localhost```
+
+### Reference
+[semesta-app2](https://github.com/islamyakin/semesta-app2)
