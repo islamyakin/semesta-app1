@@ -66,4 +66,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(run())
+}
+func run() string {
+	return "Setup Travis CI for Golang SEMESTA Hackathon"
 }
