@@ -6,6 +6,7 @@ GOGET=$(GOCMD) get
 BINARY_NAME=web-app_semesta_service
 LINTER=golangci-lint
 
+.PHONY: all test build lint
 all: test build
 
 test:
@@ -15,4 +16,4 @@ build:
       $(GOBUILD) -o $(BINARY_NAME) -v
 
 lint:
-      golangci-lint run
+      $(LINTER) run
