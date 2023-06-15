@@ -35,7 +35,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get(targetURL)
 		if err != nil {
 			fmt.Fprintf(w, "<center><h1>Halaman yang dicari tidak ditemukan, Silahkan cek kembali url Web App ke 2</h1></center>")
-			fmt.Fprintf(w, fmt.Sprintf("<center>Gagal memuat konten dari %s: %s</center>", targetURL, err.Error()))
+			fmt.Fprint(w, "<center>Gagal memuat konten dari ", targetURL, ": ", err.Error(), "</center>")
 			fmt.Fprintf(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
 			fmt.Println("Gagal memuat konten:", err)
 			return
