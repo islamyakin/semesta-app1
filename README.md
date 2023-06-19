@@ -1,4 +1,5 @@
 # SEMESTA - System Adminstrator
+![build](https://app.travis-ci.com/islamyakin/semesta-app1.svg?token=Atj2W1tzBfZmJuHYsvfS&branch=master)
 ## Details
 Repository ini berisi Web App bagian pertama, yang menampilkan Semesta dengan path ```/```, app ini berjalan pada port default 3000
 ## Config
