@@ -2,4 +2,4 @@
 *.test
 vendor/
 go.work
-.env
+.env.testing
