@@ -1,4 +1,4 @@
-module semesta-app1
+module github.com/islamyakin/semesta-app1
 
 go 1.20
 
