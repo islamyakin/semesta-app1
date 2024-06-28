@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	_ "html/template"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -60,7 +59,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(resp.Body)
 		err = resp.Body.Close()
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 
 		if err != nil {
