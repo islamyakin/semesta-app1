@@ -3,3 +3,5 @@
 vendor/
 go.work
 .env
+semesta-app1
+.idea/

@@ -3,3 +3,4 @@ Dockerfile.multistage
 .gitignore
 README.md
 .env.example
+.idea/

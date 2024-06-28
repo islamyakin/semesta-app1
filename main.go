@@ -2,51 +2,69 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/uuid"
+	_ "html/template"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
 )
 
+func genUUID() string {
+	id := uuid.New().String()
+	return id
+}
+
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
 	if r.URL.Path == "/" {
-		fmt.Fprint(w, `<body style="background-color:#000000">`)
-		fmt.Fprint(w, `<center><h1 style="color:#FFFFFF">Selamat datang di Semesta System Administrator</center></h1>`)
-		fmt.Fprint(w, `<center><img src="https://maukuliah.id/assets/img/semesta/logo-semesta-light.png" alt="Gambar"></center>`)
-		fmt.Fprint(w, `</body>`)
+		_, err := os.Stat("index.html")
+		if os.IsNotExist(err) {
+			http.Error(w, "File index.html tidak ditemukan", http.StatusInternalServerError)
+			return
+		}
+		http.ServeFile(w, r, "index.html")
 	} else if r.URL.Path == "/aboutus" {
 		err := godotenv.Load(".env")
 		if err != nil {
-			fmt.Fprintf(w, "<center><h1>Gagal memuat file .env, silahkan cek kembali</h1></center>")
-			fmt.Println("Gagal memuat file .env:", err)
+			http.Error(w, "Gagal memuat file .env", http.StatusInternalServerError)
 			return
 		}
 		targetURL := os.Getenv("APP2_URL")
+		if !strings.HasPrefix(targetURL, "http://") && !strings.HasPrefix(targetURL, "https://") {
+			targetURL = "http://" + targetURL
+		}
 		if targetURL == "" {
-			fmt.Fprintf(w, "<center><h1>URL Web App ke 2 tidak ditemukan, silahkan cek file .env</h1></center>")
-			fmt.Fprintf(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
-			fmt.Println("URL tujuan tidak ditentukan")
+			http.Error(w, "URL Web App ke 2 tidak ditemukan", http.StatusInternalServerError)
 			return
 		}
-		resp, err := http.Get(targetURL)
+		req, err := http.NewRequest("GET", targetURL, nil)
 		if err != nil {
-			fmt.Fprintf(w, "<center><h1>Halaman yang dicari tidak ditemukan, Silahkan cek kembali url Web App ke 2</h1></center>")
-			fmt.Fprint(w, "<center>Gagal memuat konten dari ", targetURL, ": ", err.Error(), "</center>")
-			fmt.Fprintf(w, `<center><img src="https://edlink.id/assets/img/404.gif" alt="err"></center>`)
-			fmt.Println("Gagal memuat konten:", err)
+			http.Error(w, "Gagal membuat request", http.StatusInternalServerError)
+			return
+		}
+		req.Header.Set("X-UID", genUUID())
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Fprintf(w, `<title>Semesta App 2</title>`)
+			http.Error(w, "Gagal memuat konten", http.StatusInternalServerError)
 			return
 		}
 
 		body, err := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		err = resp.Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if err != nil {
 			http.Error(w, "Gagal membaca respons", http.StatusInternalServerError)
-			fmt.Println("Gagal membaca respons:", err)
 			return
 		}
 		fmt.Fprintf(w, "%s", body)
@@ -62,12 +80,15 @@ func main() {
 		Handler:           http.HandlerFunc(handlerFunc),
 		ReadHeaderTimeout: 3 * time.Second,
 	}
+	fmt.Println("Server running on port 3000")
 	err := server.ListenAndServe()
 	if err != nil {
-		panic(err)
+		fmt.Println("Error starting server:", err)
+		return
 	}
 	fmt.Println(run())
 }
+
 func run() string {
 	return "Setup Travis CI for Golang SEMESTA Hackathon"
 }
